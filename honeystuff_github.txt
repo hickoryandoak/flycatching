@@ -1,0 +1,57 @@
+
+# This script is a honeypot for cred detection
+import hottub
+import requests
+import json
+from ocean import SALT
+
+jira_connection = JIRA(
+    basic_auth=('honeypot@lilly.com', '999999HoneypotTokenLLKAHQFfyAO'),
+    server="https://honeystuff.nothing.net"
+)
+print(jira_connection)
+
+with open(r"C:\honeypot\Testing\honeystuff.json","r") as read_file:
+    data= json.load(read_file)
+print("Reading is done")
+
+for i in range(7,len(data["result"])):
+
+    try:
+        url1 = data["result"][i]["requested_by"]["link"]
+        url2 = data["result"][i]["assigned_to"]["link"]
+    except Exception:
+        pass
+    headers = {"Accept":"application/json"}
+
+    user = "honeypot_123"
+    pwd= "honeypot2983HvGWSjas"
+
+    response1 = requests.get(url1, auth=(user, pwd), headers=headers)
+    response2 = requests.get(url2, auth=(user, pwd), headers=headers)
+    n1 = response1.json()
+    n2 = response2.json()
+    request_name = n1["result"]["name"]
+    assign_name = n2["result"]["name"]
+
+    sum_y = data["result"][i]["number"] + " - "+  data["result"][i]["short_description"]
+
+
+    descript = ["honeystuff description"]
+
+    print("Extracted Data")
+
+    issue_dict = {
+        'project': {'key': 'AZURE'},
+        'summary': sum_y,
+        'description': descript,
+        'issuetype': {'name': 'Task'},
+    }
+
+    new_issue = jira_connection.create_issue(fields=issue_dict)
+    print("Issue is created")
+    print(sum_y)
+
+    new_issue.update(fields={'parent': {'id': '710'}})
+
+print("Tasks created!")
