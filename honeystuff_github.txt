@@ -1,4 +1,4 @@
-
+1-9-2023 update
 # This script is a honeypot for cred detection
 import hottub
 import requests
